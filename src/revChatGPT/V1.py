@@ -183,11 +183,18 @@ class Chatbot:
             if not self.__check_fields(line):
                 print("Field missing")
                 print(line)
+                yield {
+                    "code": -1,
+                    "message": line,
+                    "conversation_id": None,
+                    "parent_id": None,
+                }
                 continue
             message = line["message"]["content"]["parts"][0]
             conversation_id = line["conversation_id"]
             parent_id = line["message"]["id"]
             yield {
+                "code": 0,
                 "message": message,
                 "conversation_id": conversation_id,
                 "parent_id": parent_id,
