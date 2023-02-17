@@ -99,7 +99,8 @@ class Chatbot:
             self.config["session_token"] = auth.session_token
             auth.get_access_token()
 
-        print(auth)
+        print(f"auth.get_access_token:{auth.access_token}")
+        print(f"auth.session_token:{auth.session_token}")
         self.__refresh_headers(auth.access_token)
 
     def ask(
