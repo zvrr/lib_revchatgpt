@@ -55,14 +55,14 @@ class Chatbot:
         self.auth = None
         if "email" in config and "password" in config:
             pass
-        elif "access_token" in config:
-            self.__refresh_headers(config["access_token"])
         elif "session_token" in config:
             pass
         else:
             raise Exception("No login details provided!")
         if "access_token" not in config:
             self.__login()
+        elif "access_token" in config:
+            self.__refresh_headers(config["access_token"])
 
     def __refresh_headers(self, access_token):
         self.session.headers.clear()
