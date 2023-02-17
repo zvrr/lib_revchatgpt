@@ -52,6 +52,7 @@ class Chatbot:
         self.conversation_mapping = {}
         self.conversation_id_prev_queue = []
         self.parent_id_prev_queue = []
+        self.auth = None
         if "email" in config and "password" in config:
             pass
         elif "access_token" in config:
@@ -101,6 +102,7 @@ class Chatbot:
 
         print(f"auth.get_access_token:{auth.access_token}")
         print(f"auth.session_token:{auth.session_token}")
+        self.auth = auth
         self.__refresh_headers(auth.access_token)
 
     def ask(
