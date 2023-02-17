@@ -3,8 +3,7 @@ Standard ChatGPT
 """
 import json
 import uuid
-from os import environ
-from os import getenv
+from os import environ, getenv
 from os.path import exists
 
 import requests
@@ -100,6 +99,7 @@ class Chatbot:
             self.config["session_token"] = auth.session_token
             auth.get_access_token()
 
+        print(auth)
         self.__refresh_headers(auth.access_token)
 
     def ask(
