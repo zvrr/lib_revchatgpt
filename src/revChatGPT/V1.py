@@ -7,7 +7,7 @@ from os import environ, getenv
 from os.path import exists
 
 import requests
-from OpenAIAuth.OpenAIAuth import OpenAIAuth
+from OpenAIAuth import Authenticator, Error as AuthError
 
 BASE_URL = environ.get("CHATGPT_BASE_URL") or "https://chatgpt.duti.tech/"
 
@@ -42,7 +42,7 @@ class Chatbot:
             }
             self.session.proxies.update(proxies)
         if "verbose" in config:
-            if type(config["verbose"]) != bool:
+            if not isinstance(config["verbose"], bool):
                 raise Exception("Verbose must be a boolean!")
             self.verbose = config["verbose"]
         else:
@@ -62,7 +62,10 @@ class Chatbot:
         else:
             raise Exception("No login details provided!")
         if "access_token" not in config:
-            self.__login()
+            try:
+                self.__login()
+            except AuthError as error:
+                raise error
 
     def __refresh_headers(self, access_token):
         self.session.headers.clear()
@@ -83,7 +86,7 @@ class Chatbot:
             "email" not in self.config or "password" not in self.config
         ) and "session_token" not in self.config:
             raise Exception("No login details provided!")
-        auth = OpenAIAuth(
+        auth = Authenticator(
             email_address=self.config.get("email"),
             password=self.config.get("password"),
             proxy=self.config.get("proxy"),
@@ -110,6 +113,7 @@ class Chatbot:
         prompt,
         conversation_id=None,
         parent_id=None,
+        timeout=360,
         # gen_title=True,
     ):
         """
@@ -126,6 +130,12 @@ class Chatbot:
             error.code = -1
             raise error
             # user-specified covid and parid, check skipped to avoid rate limit
+
+        if (
+            conversation_id is not None and conversation_id != self.conversation_id
+        ):  # Update to new conversations
+            self.parent_id = None  # Resetting parent_id
+
         conversation_id = conversation_id or self.conversation_id
         parent_id = parent_id or self.parent_id
         if conversation_id is None and parent_id is None:  # new conversation
@@ -158,7 +168,7 @@ class Chatbot:
         response = self.session.post(
             url=BASE_URL + "api/conversation",
             data=json.dumps(data),
-            timeout=360,
+            timeout=timeout,
             stream=True,
         )
         self.__check_response(response)
@@ -199,6 +209,7 @@ class Chatbot:
                 "conversation_id": conversation_id,
                 "parent_id": parent_id,
             }
+        self.conversation_mapping[conversation_id] = parent_id
         if parent_id is not None:
             self.parent_id = parent_id
         if conversation_id is not None:
