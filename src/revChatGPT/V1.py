@@ -6,55 +6,11 @@ import json
 import logging
 import time
 import uuid
-from functools import wraps
+
 from os import environ, getenv
 from os.path import exists
 
 import requests
-from httpx import AsyncClient
-from lib_openaiauth.src.OpenAIAuth import Authenticator
-from lib_openaiauth.src.OpenAIAuth import Error as AuthError
-
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(funcName)s - %(message)s",
-)
-
-log = logging.getLogger(__name__)
-
-
-def logger(is_timed):
-    """
-    Logger decorator
-    """
-
-    def decorator(func):
-        wraps(func)
-
-        def wrapper(*args, **kwargs):
-            log.info(
-                "Entering %s with args %s and kwargs %s",
-                func.__name__,
-                args,
-                kwargs,
-            )
-            start = time.time()
-            out = func(*args, **kwargs)
-            end = time.time()
-            if is_timed:
-                log.info(
-                    "Exiting %s with return value %s. Took %s seconds.",
-                    func.__name__,
-                    out,
-                    end - start,
-                )
-            else:
-                log.info("Exiting %s with return value %s", func.__name__, out)
-
-            return out
-
-        return wrapper
-
-    return decorator
 
 
 BASE_URL = environ.get("CHATGPT_BASE_URL") or "https://chatgpt.duti.tech/"
@@ -106,7 +62,6 @@ class Chatbot:
         self.conversation_id_prev_queue = []
         self.parent_id_prev_queue = []
         self.auth = None
-
         self.__check_credentials()
 
     @logger(is_timed=True)
@@ -116,7 +71,10 @@ class Chatbot:
         elif "access_token" in self.config:
             self.__refresh_headers(self.config["access_token"])
         elif "session_token" in self.config:
+
             pass
+        elif "access_token" in config:
+            self.__refresh_headers(config["access_token"])
         else:
             raise Exception("No login details provided!")
         if "access_token" not in self.config:
@@ -165,7 +123,7 @@ class Chatbot:
             auth.begin()
             self.config["session_token"] = auth.session_token
             auth.get_access_token()
-
+            
         self.auth = auth
         self.__refresh_headers(auth.access_token)
 
@@ -277,6 +235,7 @@ class Chatbot:
                     raise Error(source="ask", message=line.get("detail"), code=2)
                 raise Error(source="ask", message="Field missing", code=1)
 
+
             message = line["message"]["content"]["parts"][0]
             conversation_id = line["conversation_id"]
             parent_id = line["message"]["id"]
@@ -284,6 +243,7 @@ class Chatbot:
             log.debug("Received conversation_id: %s", conversation_id)
             log.debug("Received parent_id: %s", parent_id)
             yield {
+                "code": 0,
                 "message": message,
                 "conversation_id": conversation_id,
                 "parent_id": parent_id,
