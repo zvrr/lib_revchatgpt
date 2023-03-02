@@ -10,6 +10,12 @@ import httpx
 import requests
 import tiktoken
 from OpenAIAuth import Authenticator as OpenAIAuth
+<<<<<<< HEAD
+=======
+
+from .utils import create_session
+from .utils import get_input
+>>>>>>> 15801eb3502caba5d19fd63e1e5f7f4fcd734054
 
 ENCODER = tiktoken.get_encoding("gpt2")
 
@@ -232,30 +238,6 @@ class Chatbot:
             self.api_key = auth_request.json()["accessToken"]
 
 
-def get_input(prompt):
-    """
-    Multi-line input
-    """
-    # Display the prompt
-    print(prompt, end="")
-
-    # Initialize an empty list to store the input lines
-    lines = []
-
-    # Read lines of input until the user enters an empty line
-    while True:
-        line = input()
-        if line == "":
-            break
-        lines.append(line)
-
-    # Join the lines, separated by newlines, and store the result
-    user_input = "\n".join(lines)
-
-    # Return the input
-    return user_input
-
-
 async def main():
     """
     Testing main function
@@ -352,8 +334,9 @@ async def main():
         return True
 
     try:
+        session = create_session()
         while True:
-            prompt = get_input("\nYou:\n")
+            prompt = get_input("\nYou:\n", session=session)
             if prompt.startswith("!"):
                 if commands(prompt):
                     continue

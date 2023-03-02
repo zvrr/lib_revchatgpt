@@ -2,8 +2,15 @@
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
   "cSpell.words": [
+<<<<<<< HEAD
     "acreate",
     "Browserless",
+=======
+    "acheong",
+    "acreate",
+    "Browserless",
+    "CHATGPT",
+>>>>>>> 15801eb3502caba5d19fd63e1e5f7f4fcd734054
     "endoftext"
   ],
   "python.formatting.provider": "black",

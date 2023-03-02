@@ -3,20 +3,32 @@ from setuptools import setup
 
 setup(
     name="revChatGPT",
+<<<<<<< HEAD
     version="2.3.10",
+=======
+    version="3.0.3",
+>>>>>>> 15801eb3502caba5d19fd63e1e5f7f4fcd734054
     license="GNU General Public License v2.0",
     author="Antonio Cheong",
     author_email="acheong@student.dalat.org",
     description="ChatGPT is a reverse engineering of OpenAI's ChatGPT API",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    py_modules=["Unofficial", "V2", "V1"],
+    py_modules=["Unofficial", "V2", "V1", "V0", "V3"],
     url="https://github.com/acheong08/ChatGPT",
     install_requires=[
         "OpenAIAuth==0.3.2",
+<<<<<<< HEAD
         "requests",
         "asyncio",
         "httpx",
+=======
+        "requests[socks]",
+        "asyncio",
+        "httpx[socks]",
+        "prompt-toolkit",
+        "tiktoken",
+>>>>>>> 15801eb3502caba5d19fd63e1e5f7f4fcd734054
     ],
     extras_require={
         "unofficial": [
@@ -25,6 +37,10 @@ setup(
             "selenium",
             "tls_client",
             "requests",
+        ],
+        "official": [
+            "openai",
+            "tiktoken",
         ],
     },
     long_description=open("README.md", encoding="utf-8").read(),
