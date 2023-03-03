@@ -9,7 +9,6 @@ import sys
 import requests
 import tiktoken
 
-
 ENGINE = os.environ.get("GPT_ENGINE") or "gpt-3.5-turbo"
 ENCODER = tiktoken.get_encoding("gpt2")
 
@@ -121,6 +120,43 @@ class Chatbot:
             full_response += chunk
         return full_response
 
+    def ask_gpt(self, prompt: str, role: str = "user", **kwargs):
+        """
+        Ask a question
+        """
+        api_key = kwargs.get("api_key")
+        self.__add_to_conversation(prompt, role)
+        self.__truncate_conversation()
+        # Get response
+        response = self.session.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": "Bearer " + (api_key or self.api_key)},
+            json={
+                "model": self.engine,
+                "messages": self.conversation,
+                "temperature": kwargs.get("temperature", 0.7),
+                "top_p": kwargs.get("top_p", 1),
+                "n": kwargs.get("n", 1),
+                "user": kwargs.get("user", "user"),
+            },
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Error: {response.status_code} {response.reason} {response.text}",
+            )
+        response_json = response.json()
+        # response_role: str = None
+        choices = response_json.get("choices")
+        if choices:
+            delta = choices[0].get("message")
+            if delta:
+                if "role" in delta:
+                    response_role = delta["role"]
+                if "content" in delta:
+                    content = delta["content"]
+                    self.__add_to_conversation(content, response_role)
+        return response_json
+    
     def rollback(self, n: int = 1):
         """
         Rollback the conversation
