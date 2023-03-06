@@ -127,13 +127,25 @@ class Chatbot:
         api_key = kwargs.get("api_key")
         self.__add_to_conversation(prompt, role)
         self.__truncate_conversation()
+
+        cur_conversation: list = [
+            {
+                "role": "system",
+                "content": "你是一个人工智能，请尽可能回答正确",
+            },
+            {
+                "role": role,
+                "content": prompt,
+            },
+        ]
+
         # Get response
         response = self.session.post(
             "https://api.openai.com/v1/chat/completions",
             headers={"Authorization": "Bearer " + (api_key or self.api_key)},
             json={
                 "model": self.engine,
-                "messages": self.conversation,
+                "messages": cur_conversation,
                 "temperature": kwargs.get("temperature", 0.7),
                 "top_p": kwargs.get("top_p", 1),
                 "n": kwargs.get("n", 1),
@@ -154,9 +166,9 @@ class Chatbot:
                     response_role = delta["role"]
                 if "content" in delta:
                     content = delta["content"]
-                    self.__add_to_conversation(content, response_role)
+                    # self.__add_to_conversation(content, response_role)
         return response_json
-    
+
     def rollback(self, n: int = 1):
         """
         Rollback the conversation
