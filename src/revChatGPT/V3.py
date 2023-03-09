@@ -125,8 +125,8 @@ class Chatbot:
         Ask a question
         """
         api_key = kwargs.get("api_key")
-        self.__add_to_conversation(prompt, role)
-        self.__truncate_conversation()
+        # self.__add_to_conversation(prompt, role)
+        # self.__truncate_conversation()
 
         cur_conversation: list = [
             {
