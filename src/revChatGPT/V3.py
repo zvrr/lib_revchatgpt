@@ -152,22 +152,8 @@ class Chatbot:
                 "user": kwargs.get("user", "user"),
             },
         )
-        if response.status_code != 200:
-            raise Exception(
-                f"Error: {response.status_code} {response.reason} {response.text}",
-            )
-        response_json = response.json()
-        # response_role: str = None
-        choices = response_json.get("choices")
-        if choices:
-            delta = choices[0].get("message")
-            if delta:
-                if "role" in delta:
-                    response_role = delta["role"]
-                if "content" in delta:
-                    content = delta["content"]
-                    # self.__add_to_conversation(content, response_role)
-        return response_json
+
+        return response
 
     def rollback(self, n: int = 1):
         """
